@@ -1,5 +1,16 @@
 from tkinter import *
 
+class AMCQuestion:
+
+  def __init__(self, label="", question="", answers=[], correct=0):
+    self.label = label
+    self.question = question
+    self.answers = answers
+    self.correct = correct
+
+  def get_label(self):
+    return self.label
+
 class App:
 
   def __init__(self, master):
@@ -26,19 +37,28 @@ class App:
     self.question_listbox.grid(row=2, columnspan=3)
 
   def create_question(self):
-    questions.append("question " + str(len(questions)))
-    self.question_listbox.insert(END, questions[-1])
-    print("Create " + questions[-1] + ".")
+    questions.append(AMCQuestion("question " + str(len(questions))))
+    self.refresh_listbox()
+    print("Create " + questions[-1].get_label() + ".")
 
   def edit_question(self):
-    print("Edit " + self.question_listbox.get(ANCHOR) + ".")
+    selection_tuple = self.question_listbox.curselection()
+    # Do nothing if nothing selected.
+    if len(selection_tuple) > 0:
+      print("Edit " + questions[int(selection_tuple[0])].get_label() + ".")
 
   def delete_question(self):
     selection_tuple = self.question_listbox.curselection()
+    # Do nothing if nothing selected.
     if len(selection_tuple) > 0:
-      print("Delete " + self.question_listbox.get(ANCHOR) + ".")
+      print("Delete " + questions[int(selection_tuple[0])].get_label() + ".")
       questions.pop(int(selection_tuple[0]))
-      self.question_listbox.delete(ANCHOR)
+      self.refresh_listbox()
+
+  def refresh_listbox(self):
+    self.question_listbox.delete(0, END)
+    for question in questions:
+      self.question_listbox.insert(END, question.get_label())
 
 questions = []
 
