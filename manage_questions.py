@@ -26,13 +26,21 @@ class App:
     self.question_listbox.grid(row=2, columnspan=3)
 
   def create_question(self):
-    print("Create new question.")
+    questions.append("question " + str(len(questions)))
+    self.question_listbox.insert(END, questions[-1])
+    print("Create " + questions[-1] + ".")
 
   def edit_question(self):
-    print("Edit question.")
+    print("Edit " + self.question_listbox.get(ANCHOR) + ".")
 
   def delete_question(self):
-    print("Delete question.")
+    selection_tuple = self.question_listbox.curselection()
+    if len(selection_tuple) > 0:
+      print("Delete " + self.question_listbox.get(ANCHOR) + ".")
+      questions.pop(int(selection_tuple[0]))
+      self.question_listbox.delete(ANCHOR)
+
+questions = []
 
 root = Tk()
 
