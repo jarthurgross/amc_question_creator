@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter.filedialog import asksaveasfilename
-from os import getcwd
+import os
+from create_amc_question_dialog import CreateQuestionDialog
 
 class AMCQuestion:
 
@@ -38,7 +39,7 @@ class App:
     self.question_listbox = Listbox(frame)
     self.question_listbox.grid(row=2, columnspan=3)
 
-    self.output_filename = getcwd() + "/amc_questions_output.tex"
+    self.output_filename = os.getcwd() + "/amc_questions_output.tex"
     self.save_label = Label(frame, text=self.output_filename)
     self.save_label.grid(row=3, columnspan=3, sticky=W)
 
@@ -50,6 +51,7 @@ class App:
     save_file_button.grid(row=4, column=2, sticky=W)
 
   def create_question(self):
+    d = CreateQuestionDialog(root)
     questions.append(AMCQuestion("question " + str(len(questions))))
     self.refresh_listbox()
     print("Create " + questions[-1].get_label() + ".")
