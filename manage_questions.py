@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter.filedialog import asksaveasfilename
 
 class AMCQuestion:
 
@@ -36,6 +37,17 @@ class App:
     self.question_listbox = Listbox(frame)
     self.question_listbox.grid(row=2, columnspan=3)
 
+    self.output_filename = "./amc_questions_output.tex"
+    self.save_label = Label(frame, text=self.output_filename)
+    self.save_label.grid(row=3, sticky=W)
+
+    select_file_button = Button(frame, text="Choose file",
+      command=self.select_file)
+    select_file_button.grid(row=3, column=1, sticky=W)
+
+    save_file_button = Button(frame, text="Save", command=self.save_file)
+    save_file_button.grid(row=3, column=2, sticky=W)
+
   def create_question(self):
     questions.append(AMCQuestion("question " + str(len(questions))))
     self.refresh_listbox()
@@ -59,6 +71,13 @@ class App:
     self.question_listbox.delete(0, END)
     for question in questions:
       self.question_listbox.insert(END, question.get_label())
+
+  def select_file(self):
+    self.output_filename = asksaveasfilename()
+    self.save_label.config(text=self.output_filename)
+
+  def save_file(self):
+    print("Save to " + self.output_filename)
 
 questions = []
 
