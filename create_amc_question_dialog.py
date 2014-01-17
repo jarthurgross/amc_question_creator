@@ -1,5 +1,6 @@
 from tkinter import *
 import tksimpledialog
+from amcquestion import AMCQuestion
 
 class CreateQuestionDialog(tksimpledialog.Dialog):
 
@@ -50,6 +51,11 @@ class CreateQuestionDialog(tksimpledialog.Dialog):
 
   def apply(self):
     self.print_to_terminal()
+    label = self.question_label.get()
+    question = self.question_text.get()
+    answers = [ans_text.get() for ans_text in self.ans_texts]
+    correct = self.correct_ans.get()
+    self.new_question = AMCQuestion(label, question, answers, correct)
 
   def print_to_terminal(self):
 

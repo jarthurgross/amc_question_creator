@@ -2,17 +2,7 @@ from tkinter import *
 from tkinter.filedialog import asksaveasfilename
 import os
 from create_amc_question_dialog import CreateQuestionDialog
-
-class AMCQuestion:
-
-  def __init__(self, label="", question="", answers=[], correct=0):
-    self.label = label
-    self.question = question
-    self.answers = answers
-    self.correct = correct
-
-  def get_label(self):
-    return self.label
+from amcquestion import AMCQuestion
 
 class App:
 
@@ -52,7 +42,7 @@ class App:
 
   def create_question(self):
     d = CreateQuestionDialog(root)
-    questions.append(AMCQuestion("question " + str(len(questions))))
+    questions.append(d.new_question)
     self.refresh_listbox()
     print("Create " + questions[-1].get_label() + ".")
 
