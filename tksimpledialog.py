@@ -1,4 +1,6 @@
-# Taken from http://effbot.org/tkinterbook/tkinter-dialog-windows.htm
+# Taken from http://effbot.org/tkinterbook/tkinter-dialog-windows.htm on
+# 2014-01-16, reproducing the copyright requirement from
+# http://effbot.org/zone/copyright.htm below:
 
 # Copyright © 1995-2013 by Fredrik Lundh
 #
