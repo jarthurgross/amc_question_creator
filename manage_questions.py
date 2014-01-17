@@ -41,7 +41,7 @@ class App:
     save_file_button.grid(row=4, column=2, sticky=W)
 
   def create_question(self):
-    d = CreateQuestionDialog(root)
+    d = CreateQuestionDialog(root, title="Create Question")
     if d.new_question:
       questions.append(d.new_question)
       self.refresh_listbox()
@@ -51,7 +51,8 @@ class App:
     selection_tuple = self.question_listbox.curselection()
     # Do nothing if nothing selected.
     if len(selection_tuple) > 0:
-      d = EditQuestionDialog(questions[int(selection_tuple[0])], root)
+      d = EditQuestionDialog(questions[int(selection_tuple[0])], root,
+        title="Edit Question")
       if d.updated_question:
         questions[int(selection_tuple[0])] = d.updated_question
         self.refresh_listbox()
@@ -100,6 +101,7 @@ class App:
 questions = []
 
 root = Tk()
+root.title("AMC Question Creator")
 
 app = App(root)
 
