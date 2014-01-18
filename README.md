@@ -1,4 +1,4 @@
-amc_question_creator
+AMC Question Creator
 ====================
 
 GUI in python3 using tkinter to automate some of the mundane (and error-prone)
