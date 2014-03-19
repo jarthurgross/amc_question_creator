@@ -1,13 +1,13 @@
 from tkinter import *
-import tksimpledialog
+from tksimpledialog import Dialog
 from amcquestion import AMCQuestion
 
-class EditQuestionDialog(tksimpledialog.Dialog):
+class EditQuestionDialog(Dialog):
 
   def __init__(self, current_question, parent, title = None):
     self.updated_question = None
     self.question = current_question
-    tksimpledialog.Dialog.__init__(self, parent, title)
+    Dialog.__init__(self, parent, title)
 
   def body(self, master):
 
@@ -83,11 +83,11 @@ class EditQuestionDialog(tksimpledialog.Dialog):
     print("  \\end{choices}")
     print("\\end{question}")
 
-class CreateQuestionDialog(tksimpledialog.Dialog):
+class CreateQuestionDialog(Dialog):
 
   def __init__(self, parent, title = None):
     self.new_question = None
-    tksimpledialog.Dialog.__init__(self, parent, title)
+    Dialog.__init__(self, parent, title)
 
   def body(self, master):
 
@@ -125,6 +125,7 @@ class CreateQuestionDialog(tksimpledialog.Dialog):
         value=n))
       ans_radios[n].grid(row=rows_before_ans + n, column=2, sticky=W)
 
+    # Set the focus on the label Entry box
     return label_entry
 
   def buttonbox(self):

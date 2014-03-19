@@ -29,36 +29,10 @@
 ## following is a Tkinter approximation of the original example.
 
 import tkinter as tk
+import os
 from tksimpledialog import Dialog
 from amcquestion import AMCQuestion
-
-class CreateQuestionDialog(Dialog):
-
-    def __init__(self, parent, title = None):
-       Dialog.__init__(self, parent, title)
-
-
-    #
-    # construction hooks
-
-    def body(self, master):
-        # create dialog body.  return widget that should have
-        # initial focus.  this method should be overridden
-
-        top_label = tk.Label(master, text="New AMC question")
-        top_label.pack(padx=5, pady=5)
-
-#   def buttonbox(self):
-        # add standard button box. override if you don't want the
-        # standard buttons
-
-    #
-    # standard button semantics
-
-#   def apply(self):
-
-#       pass # override
-
+from amc_question_dialogs import CreateQuestionDialog
 
 
 class Observable:
@@ -93,7 +67,7 @@ class Model:
 
     def addQuestion(self, value):
         self.myQuestions.set(self.myQuestions.get() +
-            [AMCQuestion(label=value)])
+            [value])
 
     def removeQuestion(self, value):
         questions = self.myQuestions.get()
@@ -105,9 +79,31 @@ class View(tk.Toplevel):
     def __init__(self, master):
         tk.Toplevel.__init__(self, master)
         self.protocol('WM_DELETE_WINDOW', self.master.destroy)
-        tk.Label(self, text='My Questions').pack(side='left')
+
+        tk.Label(self, text='AMC questions').grid(row=0, columnspan=3)
+
+        self.newButton = tk.Button(self, text="New question")
+        self.newButton.grid(row=1, sticky='w')
+
+        self.editButton = tk.Button(self, text="Edit question")
+        self.editButton.grid(row=1, column=1, sticky='w')
+
+        self.deleteButton = tk.Button(self, text="Delete question")
+        self.deleteButton.grid(row=1, column=2, sticky='w')
+
         self.questionListbox = tk.Listbox(self)
-        self.questionListbox.pack(side='left')
+        self.questionListbox.grid(row=2, columnspan=3)
+
+        self.outputFilename = os.getcwd() + "/amc_questions_output.tex"
+        self.saveLabel = tk.Label(self, text=self.outputFilename)
+        self.saveLabel.grid(row=3, columnspan=3, sticky='w')
+
+        self.selectFileButton = tk.Button(self, text="Choose file")
+        self.selectFileButton.grid(row=4, column=1, sticky='w')
+
+        self.saveFileButton = tk.Button(self, text="Save")
+        self.saveFileButton.grid(row=4, column=2, sticky='w')
+
 
     def RefreshQuestions(self, questions):
         self.questionListbox.delete(0, 'end')
@@ -115,34 +111,25 @@ class View(tk.Toplevel):
             self.questionListbox.insert('end', question.get_label())
         
 
-class ChangerWidget(tk.Toplevel):
-    def __init__(self, master):
-        tk.Toplevel.__init__(self, master)
-        self.addButton = tk.Button(self, text='Add', width=8)
-        self.addButton.pack(side='left')
-        self.removeButton = tk.Button(self, text='Remove', width=8)
-        self.removeButton.pack(side='left')        
-
-
 class Controller:
     def __init__(self, root):
         self.model = Model()
         self.model.myQuestions.addCallback(self.QuestionsChanged)
-        self.view1 = View(root)
-        self.view2 = ChangerWidget(self.view1)
-        self.view2.addButton.config(command=self.AddQuestion)
-        self.view2.removeButton.config(command=self.RemoveQuestion)
+        self.view = View(root)
+        self.view.newButton.config(command=self.AddQuestion)
+        self.view.deleteButton.config(command=self.RemoveQuestion)
         self.QuestionsChanged(self.model.myQuestions.get())
         
     def AddQuestion(self):
-        d = CreateQuestionDialog(self.view2, title="Create Question")
-        self.model.addQuestion("Question")
+        d = CreateQuestionDialog(self.view, title="Create Question")
+        if d.new_question:
+            self.model.addQuestion(d.new_question)
 
     def RemoveQuestion(self):
         self.model.removeQuestion(0)
 
     def QuestionsChanged(self, questions):
-        self.view1.RefreshQuestions(questions)
+        self.view.RefreshQuestions(questions)
 
 
 if __name__ == '__main__':
