@@ -32,7 +32,7 @@ import tkinter as tk
 import os
 from tksimpledialog import Dialog
 from amcquestion import AMCQuestion
-from amc_question_dialogs import CreateQuestionDialog
+from amc_question_dialogs import CreateQuestionDialog, EditQuestionDialog
 
 
 class Observable:
@@ -65,13 +65,18 @@ class Model:
     def __init__(self):
         self.myQuestions = Observable([])
 
-    def addQuestion(self, value):
+    def addQuestion(self, question):
         self.myQuestions.set(self.myQuestions.get() +
-            [value])
+            [question])
 
-    def removeQuestion(self, value):
+    def removeQuestion(self, index):
         questions = self.myQuestions.get()
-        del questions[value]
+        del questions[index]
+        self.myQuestions.set(questions)
+
+    def changeQuestion(self, index, question):
+        questions = self.myQuestions.get()
+        questions[index] = question
         self.myQuestions.set(questions)
 
 
@@ -118,6 +123,7 @@ class Controller:
         self.view = View(root)
         self.view.newButton.config(command=self.AddQuestion)
         self.view.deleteButton.config(command=self.RemoveQuestion)
+        self.view.editButton.config(command=self.EditQuestion)
         self.QuestionsChanged(self.model.myQuestions.get())
         
     def AddQuestion(self):
@@ -126,7 +132,20 @@ class Controller:
             self.model.addQuestion(d.new_question)
 
     def RemoveQuestion(self):
-        self.model.removeQuestion(0)
+        selectionTuple = self.view.questionListbox.curselection()
+        # Only remove a question when one is selected
+        if len(selectionTuple) > 0:
+            self.model.removeQuestion(int(selectionTuple[0]))
+
+    def EditQuestion(self):
+        selectionTuple = self.view.questionListbox.curselection()
+        # Only remove a question when one is selected
+        if len(selectionTuple) > 0:
+            d = EditQuestionDialog(self.model.myQuestions.get()[int(
+                selectionTuple[0])], self.view, title="Edit Question")
+            if d.updated_question:
+                self.model.changeQuestion(int(selectionTuple[0]),
+                    d.updated_question)
 
     def QuestionsChanged(self, questions):
         self.view.RefreshQuestions(questions)

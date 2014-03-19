@@ -131,10 +131,14 @@ class CreateQuestionDialog(Dialog):
   def buttonbox(self):
     box = Frame(self)
     write_button = Button(box, text="Generate question",
-      command=self.ok)
+      command=self.ok, default='active')
     write_button.pack(side=LEFT, padx=5, pady=5)
     cancel_button = Button(box, text="Cancel", command=self.cancel)
     cancel_button.pack(side=LEFT, padx=5, pady=5)
+
+    self.bind("<Return>", self.ok)
+    self.bind("<Escape>", self.cancel)
+
     box.pack()
 
   def apply(self):
