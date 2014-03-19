@@ -29,41 +29,13 @@
 ## following is a Tkinter approximation of the original example.
 
 import tkinter as tk
+from tksimpledialog import Dialog
 
-
-class Dialog(tk.Toplevel):
+class CreateQuestionDialog(Dialog):
 
     def __init__(self, parent, title = None):
+       Dialog.__init__(self, parent, title)
 
-        tk.Toplevel.__init__(self, parent)
-        self.transient(parent)
-
-        if title:
-            self.title(title)
-
-        self.parent = parent
-
-        self.result = None
-
-        body = tk.Frame(self)
-        self.initial_focus = self.body(body)
-        body.pack(padx=5, pady=5)
-
-        self.buttonbox()
-
-        self.grab_set()
-
-        if not self.initial_focus:
-            self.initial_focus = self
-
-        self.protocol("WM_DELETE_WINDOW", self.cancel)
-
-        self.geometry("+%d+%d" % (parent.winfo_rootx()+50,
-                                  parent.winfo_rooty()+50))
-
-        self.initial_focus.focus_set()
-
-        self.wait_window(self)
 
     #
     # construction hooks
@@ -75,55 +47,16 @@ class Dialog(tk.Toplevel):
         top_label = tk.Label(master, text="New AMC question")
         top_label.pack(padx=5, pady=5)
 
-    def buttonbox(self):
+#   def buttonbox(self):
         # add standard button box. override if you don't want the
         # standard buttons
-
-        box = tk.Frame(self)
-
-        w = tk.Button(box, text="OK", width=10, command=self.ok,
-            default='active')
-        w.pack(side='left', padx=5, pady=5)
-        w = tk.Button(box, text="Cancel", width=10, command=self.cancel)
-        w.pack(side='left', padx=5, pady=5)
-
-        self.bind("<Return>", self.ok)
-        self.bind("<Escape>", self.cancel)
-
-        box.pack()
 
     #
     # standard button semantics
 
-    def ok(self, event=None):
+#   def apply(self):
 
-        if not self.validate():
-            self.initial_focus.focus_set() # put focus back
-            return
-
-        self.withdraw()
-        self.update_idletasks()
-
-        self.apply()
-
-        self.cancel()
-
-    def cancel(self, event=None):
-
-        # put focus back to the parent window
-        self.parent.focus_set()
-        self.destroy()
-
-    #
-    # command hooks
-
-    def validate(self):
-
-        return 1 # override
-
-    def apply(self):
-
-        pass # override
+#       pass # override
 
 
 
@@ -200,7 +133,7 @@ class Controller:
         self.QuestionsChanged(self.model.myQuestions.get())
         
     def AddQuestion(self):
-        d = Dialog(self.view2, title="Create Question")
+        d = CreateQuestionDialog(self.view2, title="Create Question")
         self.model.addQuestion("Question")
 
     def RemoveQuestion(self):
@@ -212,6 +145,6 @@ class Controller:
 
 if __name__ == '__main__':
     root = tk.Tk()
-    #root.withdraw()
+    root.withdraw()
     app = Controller(root)
     root.mainloop()
