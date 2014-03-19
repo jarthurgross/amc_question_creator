@@ -30,6 +30,7 @@
 
 import tkinter as tk
 from tksimpledialog import Dialog
+from amcquestion import AMCQuestion
 
 class CreateQuestionDialog(Dialog):
 
@@ -91,7 +92,8 @@ class Model:
         self.myQuestions = Observable([])
 
     def addQuestion(self, value):
-        self.myQuestions.set(self.myQuestions.get() + [value])
+        self.myQuestions.set(self.myQuestions.get() +
+            [AMCQuestion(label=value)])
 
     def removeQuestion(self, value):
         questions = self.myQuestions.get()
@@ -110,7 +112,7 @@ class View(tk.Toplevel):
     def RefreshQuestions(self, questions):
         self.questionListbox.delete(0, 'end')
         for question in questions:
-            self.questionListbox.insert('end', question)
+            self.questionListbox.insert('end', question.get_label())
         
 
 class ChangerWidget(tk.Toplevel):
