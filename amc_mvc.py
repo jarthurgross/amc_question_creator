@@ -29,6 +29,7 @@
 ## following is a Tkinter approximation of the original example.
 
 import tkinter as tk
+from tkinter.filedialog import asksaveasfilename
 import os
 from tksimpledialog import Dialog
 from amcquestion import AMCQuestion
@@ -64,6 +65,7 @@ class Observable:
 class Model:
     def __init__(self):
         self.myQuestions = Observable([])
+        self.saveFile = Observable(os.getcwd() + "/amc_questions_output.tex")
 
     def addQuestion(self, question):
         self.myQuestions.set(self.myQuestions.get() +
@@ -78,6 +80,9 @@ class Model:
         questions = self.myQuestions.get()
         questions[index] = question
         self.myQuestions.set(questions)
+
+    def setFile(self, filename):
+        self.saveFile.set(filename)
 
 
 class View(tk.Toplevel):
@@ -99,8 +104,7 @@ class View(tk.Toplevel):
         self.questionListbox = tk.Listbox(self)
         self.questionListbox.grid(row=2, columnspan=3)
 
-        self.outputFilename = os.getcwd() + "/amc_questions_output.tex"
-        self.saveLabel = tk.Label(self, text=self.outputFilename)
+        self.saveLabel = tk.Label(self)
         self.saveLabel.grid(row=3, columnspan=3, sticky='w')
 
         self.selectFileButton = tk.Button(self, text="Choose file")
@@ -120,11 +124,15 @@ class Controller:
     def __init__(self, root):
         self.model = Model()
         self.model.myQuestions.addCallback(self.QuestionsChanged)
+        self.model.saveFile.addCallback(self.FileChanged)
         self.view = View(root)
         self.view.newButton.config(command=self.AddQuestion)
         self.view.deleteButton.config(command=self.RemoveQuestion)
         self.view.editButton.config(command=self.EditQuestion)
+        self.view.selectFileButton.config(command=self.SelectFile)
+        self.view.saveFileButton.config(command=self.SaveFile)
         self.QuestionsChanged(self.model.myQuestions.get())
+        self.FileChanged(self.model.saveFile.get())
         
     def AddQuestion(self):
         d = CreateQuestionDialog(self.view, title="Create Question")
@@ -139,16 +147,51 @@ class Controller:
 
     def EditQuestion(self):
         selectionTuple = self.view.questionListbox.curselection()
-        # Only remove a question when one is selected
+        # Only open edit dialog when a question is selected
         if len(selectionTuple) > 0:
             d = EditQuestionDialog(self.model.myQuestions.get()[int(
                 selectionTuple[0])], self.view, title="Edit Question")
+            # Only replace the selected question if an edit was committed
             if d.updated_question:
                 self.model.changeQuestion(int(selectionTuple[0]),
                     d.updated_question)
 
+    def SelectFile(self):
+        filename = asksaveasfilename(initialfile=
+            "amc_questions_output.tex")
+        if filename != "":
+            self.model.setFile(filename)
+
+    def SaveFile(self):
+        questionsString = self.WriteTest()
+        with open(self.model.saveFile.get(), 'w') as f:
+            f.write(questionsString)
+        f.closed
+
     def QuestionsChanged(self, questions):
         self.view.RefreshQuestions(questions)
+
+    def FileChanged(self, filename):
+        self.view.saveLabel.config(text=filename)
+
+    def WriteTest(self):
+        questions_string = "% Created with AMC Question Creator"
+        questions = self.model.myQuestions.get()
+        for question in questions:
+            questions_string += "\n\n\\begin{question}{" + \
+                question.get_label() + "}"
+            questions_string += "\n  " + question.get_question()
+            questions_string += "\n  \\begin{choices}"
+            answers = question.get_answers()
+            marks = ["correct" if n == question.get_correct() else "wrong" for
+                n in range(len(answers))]
+            for n in range(len(answers)):
+              questions_string += \
+                "\n    \\" + marks[n] + "choice{" + answers[n] + "}"
+            questions_string += "\n  \\end{choices}"
+            questions_string += "\n\\end{question}"
+
+        return questions_string
 
 
 if __name__ == '__main__':
