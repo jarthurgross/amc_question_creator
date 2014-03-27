@@ -65,6 +65,20 @@ class Observable:
         self.data = None
 
 
+class Test:
+    def __init__(self):
+        self.string = ""
+        self.indent = 0
+
+    def newLine(self, newlines, string):
+        self.string += "\n"*newlines + "  "*self.indent + string
+
+    def increaseIndent(self):
+        self.indent += 1
+
+    def decreaseIndent(self):
+        self.indent = max(0, self.indent - 1)
+
 class Model:
     def __init__(self):
         self.myQuestions = Observable([])
@@ -89,31 +103,85 @@ class Model:
     def setFile(self, filename):
         self.saveFile.set(filename)
 
+    def newLine(newlines, indent, string):
+        return "\n"*newlines + "  "*indent + string
+
     def writeTest(self):
-        questions_string = "% Created with AMC Question Creator"
+        test = Test()
+        test.newLine(0, "%Created with AMC Question Creator")
         papertype = self.papertypes[0]
-        questions_string += "\n\\documentclass[" + papertype + "]{article}"
+        test.newLine(1, "\\documentclass[" + papertype + "]{article}")
+
+        test.newLine(2, "\\usepackage[utf8x]{input}")
+        test.newLine(1, "\\usepackage[T1]{fontenc}")
+
+        # Select options for the AMC package
+        options = ""
+        box = True
+        completemulti = True
+        separateanswersheet = True
+        if box:
+            options += ",box"
+        if completemulti:
+            options += ",completemulti"
+        if separateanswersheet:
+            options += ",separateanswersheet"
+        options = options[1:] # Remove leading comma
+
+        test.newLine(2,
+            "\\usepackage[" + options + "]{automultiplechoice}")
+
+        test.newLine(2, "\\begin{document}")
+
+        # Imagine this must seed a pseudorandom number generator. Am not
+        # randomizing questions right now, so will not use.
+        random_seed = ""
+        # random_seed = "1237893"
+        if len(random_seed) > 0:
+            test.newLine(2, indent, "\\AMCrandomseed{" + random_seed + "}")
+
+        # Redefine how questions are defined on answer sheet
+        form_question_format = "\\vspace{AMCformVSpace}\\par " + \
+            "{\\sc Question #1:} "
+        if len(form_question_format) > 0:
+            test.newLine(2,
+                "\n\n\\def\\AMCformQuestion#1{" + form_question_format + "}")
+
+        copies = 10
+        test.newLine(2, "\\onecopy{" + str(copies) + "}{")
+
+        test.newLine(2, "%%% beginning of the test sheet header:")
+
+        title = "QCM"
+        test.newLine(2, "\\noindent{\\bf " + title + " \\hfill TEST}")
+
+        date = "Mar. 26, 2014"
+        test.newLine(2, "\\vspace*{.5cm}")
+        test.newLine(1, "\\begin{minipage}{.4\\linewidth}")
+        test.increaseIndent()
+        test.newLine(1, "\\centering\\large\\bf Test\\\\ Examination on" + date)
+        test.decreaseIndent()
+        test.newLine(1, "\\end{minipage}")
+
+        # Write the questions themselves
         questions = self.myQuestions.get()
         for question in questions:
-            indent = ""
-            questions_string += "\n\n" + indent + "\\begin{question}{" + \
-                question.get_label() + "}"
-            indent += "  "
-            questions_string += "\n" + indent + question.get_question()
-            questions_string += "\n" + indent + "\\begin{choices}"
+            test.newLine(2, "\\begin{question}{" + question.get_label() + "}")
+            test.increaseIndent()
+            test.newLine(1, question.get_question())
+            test.newLine(1, "\\begin{choices}")
             answers = question.get_answers()
             marks = ["correct" if n == question.get_correct() else "wrong" for
                 n in range(len(answers))]
-            indent += "  "
+            test.increaseIndent()
             for n in range(len(answers)):
-              questions_string += \
-                "\n" + indent + "\\" + marks[n] + "choice{" + answers[n] + "}"
-            indent = indent[:-2]
-            questions_string += "\n" + indent + "\\end{choices}"
-            indent = indent[:-2]
-            questions_string += "\n" + indent + "\\end{question}"
+              test.newLine(1, "\\" + marks[n] + "choice{" + answers[n] + "}")
+            test.decreaseIndent()
+            test.newLine(1, "\\end{choices}")
+            test.decreaseIndent()
+            test.newLine(1, "\\end{question}")
 
-        return questions_string
+        return test.string
 
 
 class View(tk.Toplevel):
@@ -180,7 +248,7 @@ class Controller:
         self.FileChanged(self.model.saveFile.get())
 
     def ConfigureView(self):
-        self.view.paperOptionMenu.config(command=self.UpdatePaperType)
+        #self.view.paperOptionMenu.config(command=self.UpdatePaperType)
         self.view.newButton.config(command=self.AddQuestion)
         self.view.deleteButton.config(command=self.RemoveQuestion)
         self.view.editButton.config(command=self.EditQuestion)
