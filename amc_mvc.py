@@ -166,13 +166,15 @@ class Model:
         test.newLine(2, "%%% beginning of the test sheet header:")
 
         title = "QCM"
-        test.newLine(2, "\\noindent{\\bf " + title + " \\hfill TEST}")
+        test.newLine(2, "\\noindent{\\bf " + sanitizeLaTeX(title) +
+            " \\hfill TEST}")
 
         date = "Mar. 26, 2014"
         test.newLine(2, "\\vspace*{.5cm}")
         test.newLine(1, "\\begin{minipage}{.4\\linewidth}")
         test.increaseIndent()
-        test.newLine(1, "\\centering\\large\\bf Test\\\\ Examination on" + date)
+        test.newLine(1, "\\centering\\large\\bf Test\\\\ Examination on" +
+            sanitizeLaTeX(date))
         test.decreaseIndent()
         test.newLine(1, "\\end{minipage}")
 
@@ -181,14 +183,15 @@ class Model:
         for question in questions:
             test.newLine(2, "\\begin{question}{" + question.get_label() + "}")
             test.increaseIndent()
-            test.newLine(1, question.get_question())
+            test.newLine(1, sanitizeLaTeX(question.get_question()))
             test.newLine(1, "\\begin{choices}")
             answers = question.get_answers()
             marks = ["correct" if n == question.get_correct() else "wrong" for
                 n in range(len(answers))]
             test.increaseIndent()
             for n in range(len(answers)):
-              test.newLine(1, "\\" + marks[n] + "choice{" + answers[n] + "}")
+              test.newLine(1, "\\" + marks[n] + "choice{" +
+                  sanitizeLaTeX(answers[n]) + "}")
             test.decreaseIndent()
             test.newLine(1, "\\end{choices}")
             test.decreaseIndent()
