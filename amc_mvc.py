@@ -79,6 +79,19 @@ class Test:
     def decreaseIndent(self):
         self.indent = max(0, self.indent - 1)
 
+
+def sanitizeLaTeX(s):
+    chars_to_escape = ['#', '$', '%', '&', '_', '^', '{', '}']
+    segments = s.split('\\')
+    for n in range(len(segments)):
+        for char in chars_to_escape:
+            segments[n] = segments[n].replace(char, '\\' + char)
+        segments[n] = segments[n].replace('~', '\\textasciitilde{}')
+    sanitized = '\\textbackslash{}'.join(segments)
+
+    return sanitized
+
+
 class Model:
     def __init__(self):
         self.myQuestions = Observable([])
