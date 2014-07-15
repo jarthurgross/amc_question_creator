@@ -81,12 +81,26 @@ class Test:
 
 
 def sanitizeLaTeX(s):
+    """Converts LaTeX control characters from text input to the appropriate
+    LaTeX commands (usually involves escaping with backslash).
+
+    """
+
+    # Characters to escape with a backslash
     chars_to_escape = ['#', '$', '%', '&', '_', '^', '{', '}']
+
+    # Split the string at literal backslashes to avoid problem of replacing the
+    # backslashes inserted later as part of escape sequences.
     segments = s.split('\\')
     for n in range(len(segments)):
         for char in chars_to_escape:
             segments[n] = segments[n].replace(char, '\\' + char)
+
+        # Replace characters that require more than simple backslash escapes.
         segments[n] = segments[n].replace('~', '\\textasciitilde{}')
+
+    # Replace the literal backslashes used to split the string with proper
+    # escape sequence.
     sanitized = '\\textbackslash{}'.join(segments)
 
     return sanitized
@@ -173,7 +187,7 @@ class Model:
         test.newLine(2, "\\vspace*{.5cm}")
         test.newLine(1, "\\begin{minipage}{.4\\linewidth}")
         test.increaseIndent()
-        test.newLine(1, "\\centering\\large\\bf Test\\\\ Examination on" +
+        test.newLine(1, "\\centering\\large\\bf Test\\\\ Examination on " +
             sanitizeLaTeX(date))
         test.decreaseIndent()
         test.newLine(1, "\\end{minipage}")
