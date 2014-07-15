@@ -139,7 +139,7 @@ class Model:
         papertype = self.papertypes[0]
         test.newLine(1, "\\documentclass[" + papertype + "]{article}")
 
-        test.newLine(2, "\\usepackage[utf8x]{input}")
+        test.newLine(2, "\\usepackage[utf8x]{inputenc}")
         test.newLine(1, "\\usepackage[T1]{fontenc}")
 
         # Select options for the AMC package
@@ -168,7 +168,7 @@ class Model:
             test.newLine(2, indent, "\\AMCrandomseed{" + random_seed + "}")
 
         # Redefine how questions are defined on answer sheet
-        form_question_format = "\\vspace{AMCformVSpace}\\par " + \
+        form_question_format = "\\vspace{\\AMCformVSpace}\\par " + \
             "{\\sc Question #1:} "
         if len(form_question_format) > 0:
             test.newLine(2,
@@ -192,6 +192,20 @@ class Model:
         test.decreaseIndent()
         test.newLine(1, "\\end{minipage}")
 
+        test.newLine(2, "\\begin{center}\\em")
+        # Consider using ISO time variable here.
+        time = "10 minutes"
+        test.newLine(1, "\\Time: " + time)
+        test.increaseIndent()
+        instructions = "No documents allowed. The use of electronic" + \
+                       " calculators is forbidden."
+        test.newLine(2, instructions)
+        test.decreaseIndent()
+        test.newLine(2, "\\end{center}")
+        test.newLine(1, "\\vspace{1ex}")
+
+        test.newLine(2, "%%% end of the header")
+
         # Write the questions themselves
         questions = self.myQuestions.get()
         for question in questions:
@@ -210,6 +224,12 @@ class Model:
             test.newLine(1, "\\end{choices}")
             test.decreaseIndent()
             test.newLine(1, "\\end{question}")
+
+        # Prepare answer sheet.
+        test.newLine(2, "\\AMCcleardoublepage")
+        test.newLine(2, "\\AMCformBegin")
+
+        test.newLine(2, "%%% beginning of the answer sheet header")
 
         return test.string
 
