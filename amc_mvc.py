@@ -165,7 +165,7 @@ class Model:
         random_seed = ""
         # random_seed = "1237893"
         if len(random_seed) > 0:
-            test.newLine(2, indent, "\\AMCrandomseed{" + random_seed + "}")
+            test.newLine(2, "\\AMCrandomseed{" + random_seed + "}")
 
         # Redefine how questions are defined on answer sheet
         form_question_format = "\\vspace{\\AMCformVSpace}\\par " + \
@@ -230,6 +230,37 @@ class Model:
         test.newLine(2, "\\AMCformBegin")
 
         test.newLine(2, "%%% beginning of the answer sheet header")
+
+        test.newLine(2, r"{\large\bf Answer sheet:}")
+        test.newLine(1, r"\hfill \namefield{\fbox{")
+        test.increaseIndent()
+        test.newLine(1, r"\begin{minipage}{.5\linewidth}")
+        test.increaseIndent()
+        test.newLine(1, "Firstname and lastname:")
+        test.newLine(2, r"\vspace*{.5cm}\dotfill")
+        test.newLine(1, r"\vspace*{1mm}")
+        test.decreaseIndent()
+        test.newLine(1, r"\end{minipage}")
+        test.decreaseIndent()
+        test.newLine(1, "}}")
+
+        test.newLine(2, r"\begin{center}")
+        test.increaseIndent()
+        test.newLine(1, r"\bf\em Answers must be given exclusively on this " +
+                     r"sheet:")
+        test.newLine(1, "answers given on the other sheets will be ignored.")
+        test.decreaseIndent()
+        test.newLine(1, r"\end{center}")
+
+        test.newLine(2, "%%% end of the answer sheet header")
+
+        test.newLine(2, r"\AMCform")
+
+        test.newLine(2, r"\clearpage")
+
+        test.newLine(2, "}")
+
+        test.newLine(2, r"\end{document}")
 
         return test.string
 
