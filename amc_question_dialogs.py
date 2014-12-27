@@ -62,26 +62,12 @@ class EditQuestionDialog(Dialog):
     box.pack()
 
   def apply(self):
-    self.print_to_terminal()
     label = self.question_label.get()
     question = self.question_text.get()
     answers = [ans_text.get() for ans_text in self.ans_texts]
     correct = self.correct_ans.get()
     self.updated_question = AMCQuestion(label, question, answers, correct)
 
-  def print_to_terminal(self):
-
-    print("\\begin{question}{" + self.question_label.get() + "}")
-    print("  " + self.question_text.get())
-    print("  \\begin{choices}")
-    marks = ["correct" if n == self.correct_ans.get() else "wrong" for n in
-      range(self.answer_count)]
-
-    for n in range(self.answer_count):
-      print("    \\" + marks[n] + "choice{" + self.ans_texts[n].get() + "}")
-
-    print("  \\end{choices}")
-    print("\\end{question}")
 
 class CreateQuestionDialog(Dialog):
 
@@ -142,23 +128,9 @@ class CreateQuestionDialog(Dialog):
     box.pack()
 
   def apply(self):
-    self.print_to_terminal()
     label = self.question_label.get()
     question = self.question_text.get()
     answers = [ans_text.get() for ans_text in self.ans_texts]
     correct = self.correct_ans.get()
     self.new_question = AMCQuestion(label, question, answers, correct)
 
-  def print_to_terminal(self):
-
-    print("\\begin{question}{" + self.question_label.get() + "}")
-    print("  " + self.question_text.get())
-    print("  \\begin{choices}")
-    marks = ["correct" if n == self.correct_ans.get() else "wrong" for n in
-      range(self.answer_count)]
-
-    for n in range(self.answer_count):
-      print("    \\" + marks[n] + "choice{" + self.ans_texts[n].get() + "}")
-
-    print("  \\end{choices}")
-    print("\\end{question}")
